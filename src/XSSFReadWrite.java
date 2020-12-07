@@ -27,7 +27,7 @@ public class XSSFReadWrite {
 		
 		props.setProperty("key", "value");
 		
-		FileOutputStream fileopts = new FileOutputStream(new File("propsxlsx.properties"));
+		FileOutputStream fileopts = new FileOutputStream(new File(getFileNameBase(this.fileName) + "-" + "en" + ".properties"));
 		
 		props.store(fileopts, null);
 		
@@ -38,5 +38,11 @@ public class XSSFReadWrite {
 		try (OPCPackage pkg = OPCPackage.open(fileName, PackageAccess.READ)) {
 			return new XSSFWorkbook(pkg);      // NOSONAR - should not be closed here
 		}
+	}
+	
+	private static String getFileNameBase(String fileName) {
+		String[] arrOfStr = fileName.split("\\.(?=[^\\.]+$)");
+		
+		return arrOfStr[0];
 	}
 }

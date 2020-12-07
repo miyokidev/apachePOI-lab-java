@@ -25,7 +25,7 @@ public class Program {
 			
 			case "xls":
 				HSSFReadWrite hssfRW = new HSSFReadWrite(fileName);
-				hssfRW.processSheet(hssfRW.fileName);
+				hssfRW.processSheet();
 				break;
 			case "xlsx":
 				XSSFReadWrite xssfRW = new XSSFReadWrite(fileName);
@@ -38,7 +38,7 @@ public class Program {
 		}
 	}
 	
-	// Methods that returns the extension of the file we pass in parameter.
+	// Methods that returns the extension
 	private static String getFileExtension(String fileName) {
 		String extension = "";
 		
