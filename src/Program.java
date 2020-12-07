@@ -6,11 +6,18 @@ public class Program {
 
 	public static void main(String[] args) throws Exception {
 		
+		/*
+		 * You must pass arguments as the filename you wanna read.
+		 * It will automatically generate the .properties file.
+		 */
+		
+		// Checks if the user did pass an argument
 		if (args.length < 1) {
 			System.err.println("At least one argument expected");
 			return;
 		}
 		
+		// for each arguments passed check the extension to see if it's valid or not (xls or xlsx) if no return an error.
 		for (String fileName : args) {
 			String fileExtension = getFileExtension(fileName);
 			
@@ -31,6 +38,7 @@ public class Program {
 		}
 	}
 	
+	// Methods that returns the extension of the file we pass in parameter.
 	private static String getFileExtension(String fileName) {
 		String extension = "";
 		
