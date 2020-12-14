@@ -1,11 +1,12 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.*;
 
 public class HSSFReadWrite {
 	
@@ -17,7 +18,6 @@ public class HSSFReadWrite {
 	
 	public void processSheet() throws Exception {
 		try (HSSFWorkbook wb = HSSFReadWrite._readFile(this.fileName)) { 
-			System.out.println("hssf");
 			_readExcel(wb);
 		}
 	}
@@ -33,56 +33,66 @@ public class HSSFReadWrite {
 		Sheet sheet = wb.getSheetAt(0);
 		DataFormatter dataFormatter = new DataFormatter();
 		
-		String[] keys = new String[sheet.getLastRowNum()+1];
-		String[][] dictionaries = new String[sheet.getRow(0).getLastCellNum()+1][sheet.getLastRowNum()+1];
-		
 		int rowNb = 0;
 		int colKey = 0;
+		boolean lookingForHeader = true;
 		
-		/*
-		 * FIX THIS PART
-		 */
+		Map<Integer, Language> translationsMap = new HashMap<>();
 		
-		for (Row row: sheet) {
-			int colNb = 0;
+		
+		Iterator<Row> rowIterator = sheet.iterator();
+		
+		while (rowIterator.hasNext()) {
+			Row row = rowIterator.next();
 			
-			for (Cell cell: row) {
-				if (dataFormatter.formatCellValue(cell).toLowerCase().equals("key")) {
-					colKey = colNb;
-					System.out.println(colKey);
+			Iterator<Cell> cellIterator = row.cellIterator();
+			
+			if (lookingForHeader && !checkIfRowIsEmpty(row)) { // Read Header
+				while(cellIterator.hasNext()) {
+					
+					Cell cell = cellIterator.next();
+					
+					if (dataFormatter.formatCellValue(cell).toLowerCase().equals("key")) {
+						colKey = cell.getColumnIndex();
+					}
+					
+					if (dataFormatter.formatCellValue(cell).length() == 2) {
+						translationsMap.put(cell.getColumnIndex(), new Language(dataFormatter.formatCellValue(cell)));
+					}
 				}
 				
-				if (dataFormatter.formatCellValue(cell).length() == 2) {
-					System.out.println("lang");
+				lookingForHeader = false;
+			} else { // Read Translations
+				while(cellIterator.hasNext()) {
+					
+					Cell cell = cellIterator.next();
+					
+					if (translationsMap.containsKey(cell.getColumnIndex())) {
+						translationsMap.get(cell.getColumnIndex()).addTranslation(dataFormatter.formatCellValue(row.getCell(colKey)), dataFormatter.formatCellValue(cell));
+					}
 				}
-				
-				colNb++;
 			}
-			rowNb++;
 		}
 		
-		/*
-		for (int i = 0; i < dictionaries.length; i++) {
-			_writeToPropertiesFile(keys,dictionaries[i]);
-		}
-		*/
+		_writeToPropertiesFile(translationsMap);
 		wb.close();
 	}
 	
-	private void _writeToPropertiesFile(String[] keys, String[] values) throws IOException {
-		Properties props = new Properties();
-		
-		for (int i = 0; i < keys.length; i++) {
-			if (keys[i] != null && keys[i] != "") {
-				props.setProperty(keys[i], "fix");
+	private void _writeToPropertiesFile(Map<Integer, Language> translationsMap) throws IOException {
+		for (Map.Entry<Integer, Language> entry : translationsMap.entrySet()) {
+			Properties props = new Properties();
+			
+			for (Map.Entry<String, String> string : entry.getValue().translations.entrySet()) {
+				props.setProperty(string.getKey(), string.getValue());
 			}
+			
+			FileOutputStream fileopts = new FileOutputStream(new File(getFileNameBase(this.fileName) + "-" + entry.getValue().lang + ".properties"));
+			
+			props.store(fileopts, null);
+			
+			fileopts.close();
+			
 		}
-		
-		FileOutputStream fileopts = new FileOutputStream(new File(getFileNameBase(this.fileName) + "-" + "fr" + ".properties"));
-		
-		props.store(fileopts, null);
-		
-		fileopts.close();
 	}
 	
 	private static HSSFWorkbook _readFile(String fileName) throws IOException { 
@@ -96,4 +106,22 @@ public class HSSFReadWrite {
 		
 		return arrOfStr[0];
 	}
+	
+	private boolean checkIfRowIsEmpty(Row row) {
+	    if (row == null) {
+	        return true;
+	    }
+	    if (row.getLastCellNum() <= 0) {
+	        return true;
+	    }
+	    for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+	        Cell cell = row.getCell(cellNum);
+	        if (cell != null && cell.getCellType() != CellType.BLANK) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+	
+	
 }
