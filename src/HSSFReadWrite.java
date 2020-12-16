@@ -33,13 +33,14 @@ public class HSSFReadWrite {
 		Sheet sheet = wb.getSheetAt(0);
 		DataFormatter dataFormatter = new DataFormatter();
 		
-		int rowNb = 0;
-		int colKey = 0;
-		boolean lookingForHeader = true;
+		int colKey = 0; // Column number where are the keys
+		boolean lookingForHeader = true; // Flag to know if we're still looking for the header row
 		
 		Map<Integer, Language> translationsMap = new HashMap<>();
 		
-		
+		//===============================================
+		// We loop through the sheet
+		//===============================================
 		Iterator<Row> rowIterator = sheet.iterator();
 		
 		while (rowIterator.hasNext()) {
@@ -52,11 +53,11 @@ public class HSSFReadWrite {
 					
 					Cell cell = cellIterator.next();
 					
-					if (dataFormatter.formatCellValue(cell).toLowerCase().equals("key")) {
+					if (dataFormatter.formatCellValue(cell).toLowerCase().equals("key")) { // Looking for the header column
 						colKey = cell.getColumnIndex();
 					}
 					
-					if (dataFormatter.formatCellValue(cell).length() == 2) {
+					if (dataFormatter.formatCellValue(cell).length() == 2) { // Looking for all languages
 						translationsMap.put(cell.getColumnIndex(), new Language(dataFormatter.formatCellValue(cell)));
 					}
 				}
@@ -73,8 +74,9 @@ public class HSSFReadWrite {
 				}
 			}
 		}
+		//===============================================
 		
-		_writeToPropertiesFile(translationsMap);
+		_writeToPropertiesFile(translationsMap); // We call the method to write the properties file(s).
 		wb.close();
 	}
 	

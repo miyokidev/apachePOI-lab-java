@@ -32,7 +32,7 @@ public class Program {
 				xssfRW.processSheet(xssfRW.fileName);
 				break;
 			default:
-				System.err.println("Not valid extension must be .xls or .xlsx");
+				System.err.println(fileName + " : Not valid extension must be .xls or .xlsx");
 				break;
 			}
 		}
