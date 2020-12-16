@@ -42,12 +42,15 @@ public class XSSFReadWrite {
 		DataFormatter dataFormatter = new DataFormatter();
 		
 		int rowNb = 0;
-		int colKey = 0;
-		boolean lookingForHeader = true;
+		int colKey = 0; // Column number where are the keys
+		boolean lookingForHeader = true; // Flag to know if we're still looking for the header row
 		
 		Map<Integer, Language> translationsMap = new HashMap<>();
 		
 		
+		//===============================================
+		// We loop through the sheet
+		//===============================================
 		Iterator<Row> rowIterator = sheet.iterator();
 		
 		while (rowIterator.hasNext()) {
