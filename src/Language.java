@@ -1,5 +1,10 @@
 import java.util.*;
 
+/**
+ * Class Language
+ * @author miyoki
+ *
+ */
 public class Language {
 	
 	public String lang;

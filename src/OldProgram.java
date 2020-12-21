@@ -1,4 +1,8 @@
-public class Program {
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.apache.commons.compress.compressors.FileNameUtil;
+
+public class OldProgram {
 
 	public static void main(String[] args) throws Exception {
 		
@@ -21,13 +25,13 @@ public class Program {
 			
 			case "xls":
 				System.out.println("xls file detected");
-				HSSFReadWrite hssfRW = new HSSFReadWrite(fileName);
+				OldHSSFReadWrite hssfRW = new OldHSSFReadWrite(fileName);
 				hssfRW.processSheet();
 				break;
 			case "xlsx":
 				System.out.println("xlsx file detected");
-				XSSFReadWrite xssfRW = new XSSFReadWrite(fileName);
-				xssfRW.processSheet();
+				OldXSSFReadWrite xssfRW = new OldXSSFReadWrite(fileName);
+				xssfRW.processSheet(xssfRW.fileName);
 				break;
 			default:
 				System.err.println(fileName + " : Not valid extension must be .xls or .xlsx");
